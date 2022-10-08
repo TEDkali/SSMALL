@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+<!--1.创建userRealm Bean-->
+    <bean id="UserRealm" class="com.gxa.realm.UserRealm">
+<!--        <property name="credentialsMatcher">-->
+<!--            <bean class="org.apache.shiro.authc.credential.HashedCredentialsMatcher">-->
+<!--                <property name="hashAlgorithmName" value="MD5"/>-->
+<!--                <property name="hashIterations" value="1024"/>-->
+<!--            </bean>-->
+<!--        </property>-->
+    </bean>
+    <!--2.配置securityManager-->
+    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+<!--        将realm交给securityManager管理-->
+        <property name="realm" ref="UserRealm"/>
+    </bean>
+
+<!--    权限
+            配置处理器-->
+    <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+        <property name="securityManager" ref="securityManager"/>
+    </bean>
+
+<!--    shiro的总配置
+            注意该bean的id名需要与web.xml中的过滤器名字相对应-->
+    <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+<!--        1.管理shiro管理器-->
+        <property name="securityManager" ref="securityManager"/>
+<!--        2.登录页面-->
+        <property name="loginUrl" value="/"/>
+<!--        3.登录成功页面-->
+        <property name="successUrl" value="/emp/list"/>
+<!--        4.未授权跳跃-->
+        <property name="unauthorizedUrl" value="/unauthorized.html"/>
+<!--        配置以下哪些路径页面需要收到保护以及访问这些页面需要权限-->
+<!--            1.anon 可以匿名访问-->
+<!--            2.auth 需要登录后才能访问-->
+        <property name="filterChainDefinitions">
+            <value>
+                /=anon
+                /asserts/** =anon
+                /index.html=anon
+                /user/login=anon
+                /user/logout=logout
+                /** = authc
+
+            </value>
+        </property>
+    </bean>
+</beans>
